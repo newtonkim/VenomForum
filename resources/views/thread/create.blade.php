@@ -19,8 +19,9 @@
         </div>
         <div class="mb-3">
             <label for="thread" class="form-label">Thread</label>
-            <textarea class="form-control" id="thread" name="thread" value="{{ old('thread') }}">
-                        </textarea>
+            <textarea class="form-control" id="thread" name="thread">
+                {{ old('thread') }}
+                            </textarea>
 
 
         </div>

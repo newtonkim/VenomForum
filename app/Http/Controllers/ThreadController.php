@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class ThreadController extends Controller
 {
+
+    public function __construct()
+    {
+        return $this->middleware('auth')->except('index');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -39,12 +44,14 @@ class ThreadController extends Controller
     {
 
         $this->validate($request, [
-            'subject' => 'required|min:10',
+            'subject' => 'required|min:5',
             'thread' => 'required|min:20',
             'type' => 'required'
         ]);
 
-        Thread::create($request->all());
+        // attach a user id when creating a thread
+
+        auth()->user()->threads()->create($request->all());
 
         return back()->withMessage('Thread Created Successfully');
     }
@@ -80,11 +87,17 @@ class ThreadController extends Controller
      */
     public function update(Request $request, Thread $thread)
     {
+        if (auth()->user()->id !== $thread->user_id) {
+            abort(code: 401, message: "unauthorised");
+        }
+
         $this->validate($request, [
             'subject' => 'required|min:10',
             'thread' => 'required|min:20',
             'type' => 'required'
         ]);
+
+
 
         $thread->update($request->all());
 
@@ -99,6 +112,10 @@ class ThreadController extends Controller
      */
     public function destroy(Thread $thread)
     {
+        if (auth()->user()->id !== $thread->user_id) {
+            abort(code: 401, message: "unauthorised");
+        }
+
         $thread->delete();
 
         return redirect()->route('thread.index')->withMessage('Thread Deleted Successfully');
